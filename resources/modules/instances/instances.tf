@@ -1,11 +1,3 @@
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "6.38.0"
-    }
-  }
-}
 # Create the service account
 resource "google_service_account" "vm_sa" {
   project      = var.project_id
