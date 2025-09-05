@@ -1,0 +1,77 @@
+#!/bin/bash
+set -euxo pipefail
+
+# Install dependencies
+apt-get update && apt-get install -y unzip curl docker.io
+
+# Install Nomad
+NOMAD_VERSION="1.10.2"
+curl -sLo nomad.zip https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
+unzip nomad.zip
+mv nomad /usr/local/bin/
+rm nomad.zip
+
+# Create Nomad user (optional security best practice)
+useradd --system --home /etc/nomad.d --shell /bin/false nomad
+
+# Add nomad user to docker group
+sudo usermod -aG docker nomad
+sudo -u nomad docker ps
+
+# Get local IP
+LOCAL_IP=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip)
+export NOMAD_IP=$LOCAL_IP
+
+sudo mkdir -p /opt/nomad/
+sudo chown -R nomad:nomad /opt/nomad/
+
+# Write config file
+cat > /etc/nomad.hcl <<EOF
+datacenter = "dc1"
+data_dir = "/opt/nomad/data"
+bind_addr = "0.0.0.0"
+
+advertise {
+  http = "$LOCAL_IP"
+  rpc  = "$LOCAL_IP"
+  serf = "$LOCAL_IP"
+}
+
+server {
+  enabled          = true
+  bootstrap_expect = 3
+  server_join {
+      retry_join = ["provider=gce tag_value=nomad"]
+  }
+}
+
+client {
+  enabled = true
+  server_join {
+    retry_join = ["provider=gce tag_value=nomad"]
+  }
+}
+EOF
+
+# Create a systemd service that runs Nomad in dev mode
+cat <<EOF > /etc/systemd/system/nomad.service
+[Unit]
+Description=Nomad Dev Agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=nomad
+Group=nomad
+ExecStart=/usr/local/bin/nomad agent -config=/etc/nomad.hcl
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Start the service
+systemctl daemon-reexec
+systemctl enable nomad
+systemctl start nomad
