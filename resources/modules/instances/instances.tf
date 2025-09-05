@@ -24,6 +24,12 @@ resource "google_project_iam_member" "vm_storage_access" {
   member  = "serviceAccount:${google_service_account.vm_sa.email}"
 }
 
+resource "google_project_iam_member" "vm_compute_access" {
+  project = var.project_id
+  role    = "roles/compute.viewer"
+  member  = "serviceAccount:${google_service_account.vm_sa.email}"
+}
+
 resource "google_compute_instance_template" "gce_nomad_template" {
 
   disk {
@@ -54,7 +60,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
 
   service_account {
     email  = google_service_account.vm_sa.email
-    scopes = ["cloud-platform"]
+    scopes = ["roles/compute.viewer"]
   }
 
   metadata = {
