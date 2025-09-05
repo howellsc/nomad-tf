@@ -81,10 +81,10 @@ resource "google_compute_instance_template" "gce_nomad_template" {
   # }
 }
 
-resource "google_compute_instance_group_manager" "gce_nomad_mig" {
+resource "google_compute_region_instance_group_manager" "gce_nomad_mig" {
   name = "gce-nomad-mig"
 
-  zone               = var.zone
+  region             = var.region
   base_instance_name = "gce-nomad"
   version {
     instance_template = google_compute_instance_template.gce_nomad_template.id
@@ -115,14 +115,16 @@ resource "google_compute_region_backend_service" "gce_nomad_backend_service" {
   load_balancing_scheme = "INTERNAL_MANAGED"
 
   backend {
-    group = google_compute_instance_group_manager.gce_nomad_mig.instance_group
+    balancing_mode  = "UTILIZATION"
+    capacity_scaler = 1
+    group           = google_compute_region_instance_group_manager.gce_nomad_mig.instance_group
   }
 
   health_checks = [google_compute_region_health_check.nomad_tcp.id]
 
   port_name = "http" # Refer to the named port in the MIG (usually "http" or "https")
 
-  depends_on = [google_compute_instance_group_manager.gce_nomad_mig]
+  depends_on = [google_compute_region_instance_group_manager.gce_nomad_mig]
 }
 
 resource "google_os_config_patch_deployment" "patch" {
