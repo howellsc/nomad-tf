@@ -142,6 +142,6 @@ resource "google_compute_health_check" "nomad_tcp" {
   unhealthy_threshold = 3
 
   tcp_health_check {
-    port_name = "http"
+    port = 4646
   }
 }
