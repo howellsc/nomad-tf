@@ -1,7 +1,8 @@
 resource "google_storage_bucket" "startup_scripts" {
-  name          = "${var.project_id}-startup-scripts"
-  location      = var.region
-  force_destroy = true
+  name                        = "${var.project_id}-startup-scripts"
+  location                    = var.region
+  force_destroy               = true
+  uniform_bucket_level_access = true
 }
 
 resource "google_storage_bucket_object" "nomad_script" {
