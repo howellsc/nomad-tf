@@ -81,7 +81,7 @@ resource "google_compute_instance_group_manager" "gce_nomad_mig" {
 
   named_port {
     name = "http"
-    port = 80
+    port = 4646
   }
 
   auto_healing_policies {
@@ -142,6 +142,6 @@ resource "google_compute_health_check" "nomad_tcp" {
   unhealthy_threshold = 3
 
   tcp_health_check {
-    port = 4646
+    port_name = "http"
   }
 }
