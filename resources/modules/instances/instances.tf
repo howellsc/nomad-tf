@@ -112,7 +112,7 @@ resource "google_compute_region_backend_service" "gce_nomad_backend_service" {
   name     = "gce-backend-service"
   protocol = "HTTP"
 
-  load_balancing_scheme = "INTERNAL_MANAGED"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
 
   backend {
     balancing_mode  = "UTILIZATION"
