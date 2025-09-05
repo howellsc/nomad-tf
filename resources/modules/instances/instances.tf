@@ -1,3 +1,18 @@
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "6.38.0"
+    }
+  }
+}
+# Create the service account
+resource "google_service_account" "vm_sa" {
+  project      = var.project_id
+  account_id   = "vm-service-account"
+  display_name = "VM Service Account"
+}
+
 resource "google_storage_bucket" "startup_scripts" {
   name                        = "${var.project_id}-startup-scripts"
   location                    = var.region
@@ -14,7 +29,7 @@ resource "google_storage_bucket_object" "nomad_script" {
 resource "google_project_iam_member" "vm_storage_access" {
   project = var.project_id
   role    = "roles/storage.objectViewer"
-  member  = "serviceAccount:92595832024-compute@developer.gserviceaccount.com"
+  member  = "serviceAccount:${google_service_account.vm_sa.email}"
 }
 
 resource "google_compute_instance_template" "gce_nomad_template" {
@@ -45,6 +60,11 @@ resource "google_compute_instance_template" "gce_nomad_template" {
 
   tags = ["allow-tcp-22-ingress", "allow-http-80-443-egress", "nomad"]
 
+  service_account {
+    email  = google_service_account.vm_sa.email
+    scopes = ["cloud-platform"]
+  }
+
   metadata = {
     "enable-osconfig"  = "TRUE"
     startup-script-url = "gs://${google_storage_bucket.startup_scripts.name}/nomad-dev.sh"
@@ -55,18 +75,18 @@ resource "google_compute_instance_template" "gce_nomad_template" {
     preemptible        = false
   }
 
-  service_account {
-    email = "92595832024-compute@developer.gserviceaccount.com"
-    scopes = [
-      "https://www.googleapis.com/auth/devstorage.read_only",
-      "https://www.googleapis.com/auth/logging.write",
-      "https://www.googleapis.com/auth/monitoring.write",
-      "https://www.googleapis.com/auth/service.management.readonly",
-      "https://www.googleapis.com/auth/servicecontrol",
-      "https://www.googleapis.com/auth/trace.append",
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
-  }
+  # service_account {
+  #   email = "92595832024-compute@developer.gserviceaccount.com"
+  #   scopes = [
+  #     "https://www.googleapis.com/auth/devstorage.read_only",
+  #     "https://www.googleapis.com/auth/logging.write",
+  #     "https://www.googleapis.com/auth/monitoring.write",
+  #     "https://www.googleapis.com/auth/service.management.readonly",
+  #     "https://www.googleapis.com/auth/servicecontrol",
+  #     "https://www.googleapis.com/auth/trace.append",
+  #     "https://www.googleapis.com/auth/cloud-platform"
+  #   ]
+  # }
 }
 
 resource "google_compute_instance_group_manager" "gce_nomad_mig" {
@@ -85,7 +105,7 @@ resource "google_compute_instance_group_manager" "gce_nomad_mig" {
   }
 
   auto_healing_policies {
-    health_check      = google_compute_health_check.nomad_tcp.id
+    health_check      = google_compute_region_health_check.nomad_tcp.id
     initial_delay_sec = 600
   }
 
@@ -106,7 +126,7 @@ resource "google_compute_region_backend_service" "gce_nomad_backend_service" {
     group = google_compute_instance_group_manager.gce_nomad_mig.instance_group
   }
 
-  health_checks = [google_compute_health_check.nomad_tcp.id]
+  health_checks = [google_compute_region_health_check.nomad_tcp.id]
 
   port_name = "http" # Refer to the named port in the MIG (usually "http" or "https")
 
@@ -134,12 +154,13 @@ resource "google_os_config_patch_deployment" "patch" {
   }
 }
 
-resource "google_compute_health_check" "nomad_tcp" {
+resource "google_compute_region_health_check" "nomad_tcp" {
   name                = "nomad-tcp-health-check"
   check_interval_sec  = 5
   timeout_sec         = 5
   healthy_threshold   = 2
   unhealthy_threshold = 3
+  region              = var.region
 
   tcp_health_check {
     port = 4646
