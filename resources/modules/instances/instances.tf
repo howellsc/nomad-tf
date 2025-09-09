@@ -1,12 +1,12 @@
 # Create the service account
 resource "google_service_account" "vm_sa" {
   project      = var.project_id
-  account_id   = "vm-service-account"
+  account_id   = "${var.name}-vm-service-account"
   display_name = "VM Service Account"
 }
 
 resource "google_storage_bucket" "startup_scripts" {
-  name                        = "${var.project_id}-startup-scripts"
+  name                        = "${var.name}-${var.project_id}-startup-scripts"
   location                    = var.region
   force_destroy               = true
   uniform_bucket_level_access = true
@@ -43,7 +43,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
   region = var.region
 
   machine_type = "e2-micro"
-  name         = "dev-how-micro-nomad"
+  name         = "${var.name}-dev-micro-nomad"
 
   network_interface {
     network    = var.vpc_name
@@ -51,7 +51,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
   }
 
   labels = {
-    "organisation" = "howells"
+    "organisation" = var.name
     "type"         = "nomad"
     "purpose"      = "container-orchestration"
   }
@@ -88,7 +88,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
 }
 
 resource "google_compute_region_instance_group_manager" "gce_nomad_mig" {
-  name = "gce-nomad-mig"
+  name = "${var.name}-gce-nomad-mig"
 
   region             = var.region
   base_instance_name = "gce-nomad"
@@ -115,7 +115,7 @@ resource "google_compute_region_instance_group_manager" "gce_nomad_mig" {
 }
 
 resource "google_compute_region_backend_service" "gce_nomad_backend_service" {
-  name     = "gce-backend-service"
+  name     = "${var.name}-gce-backend-service"
   protocol = "HTTP"
 
   load_balancing_scheme = "EXTERNAL_MANAGED"
@@ -134,7 +134,7 @@ resource "google_compute_region_backend_service" "gce_nomad_backend_service" {
 }
 
 resource "google_os_config_patch_deployment" "patch" {
-  patch_deployment_id = "patch-deploy"
+  patch_deployment_id = "${var.name}-patch-deploy"
 
   instance_filter {
     all = true
@@ -155,7 +155,7 @@ resource "google_os_config_patch_deployment" "patch" {
 }
 
 resource "google_compute_region_health_check" "nomad_tcp" {
-  name                = "nomad-tcp-health-check"
+  name                = "${var.name}-nomad-tcp-health-check"
   check_interval_sec  = 5
   timeout_sec         = 5
   healthy_threshold   = 2

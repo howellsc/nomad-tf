@@ -19,7 +19,7 @@ variable "region" {
   # Default value
 }
 
-variable "zone" {
-  description = "The zone where resources will be created"
+variable "name" {
+  description = "Unique name which all of the resources will have prefixed"
   type        = string
 }

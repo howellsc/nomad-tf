@@ -9,8 +9,8 @@ resource "google_compute_firewall" "http" {
   }
 
   direction = "INGRESS"
-  name      = "howells-network-http"
-  network   = "howells-network"
+  name      = "${var.name}-network-http"
+  network = google_compute_network.vpc.id
   priority  = 1000
   source_ranges = [
     "0.0.0.0/0"
@@ -34,8 +34,8 @@ resource "google_compute_firewall" "ssh" {
   }
 
   direction = "INGRESS"
-  name      = "howells-network-ssh"
-  network   = "howells-network"
+  name      = "${var.name}-network-ssh"
+  network = google_compute_network.vpc.id
   priority  = 1000
   source_ranges = [
     "0.0.0.0/0"
@@ -51,8 +51,8 @@ resource "google_compute_firewall" "ssh" {
 }
 
 resource "google_compute_firewall" "allow_nomad_ui" {
-  name    = "howells-network-nomad-ui"
-  network = "howells-network"
+  name    = "${var.name}-network-nomad-ui"
+  network = google_compute_network.vpc.id
 
   allow {
     protocol = "tcp"
@@ -69,8 +69,8 @@ resource "google_compute_firewall" "allow_nomad_ui" {
 }
 
 resource "google_compute_firewall" "allow_nomad_cluster" {
-  name    = "howells-network-nomad-cluster"
-  network = "howells-network"
+  name    = "${var.name}-network-nomad-cluster"
+  network = google_compute_network.vpc.id
 
   allow {
     protocol = "tcp"
@@ -100,8 +100,8 @@ resource "google_compute_firewall" "egress" {
   }
 
   direction = "EGRESS"
-  name      = "howells-network-http-egress"
-  network   = "howells-network"
+  name      = "${var.name}-network-http-egress"
+  network = google_compute_network.vpc.id
   priority  = 1000
   destination_ranges = [
     "0.0.0.0/0"

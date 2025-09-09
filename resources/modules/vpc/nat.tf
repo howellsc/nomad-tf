@@ -1,5 +1,5 @@
 resource "google_compute_router" "nat_router" {
-  name    = "howells-nat-router"
+  name    = "${var.name}-nat-router"
   network = google_compute_network.vpc.id
   region  = var.region
 
@@ -9,7 +9,7 @@ resource "google_compute_router" "nat_router" {
 }
 
 resource "google_compute_router_nat" "nat" {
-  name   = "howells-nat"
+  name   = "${var.name}-nat"
   router = google_compute_router.nat_router.name
   region = var.region
 

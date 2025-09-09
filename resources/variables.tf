@@ -16,3 +16,9 @@ variable "zone" {
   default     = "us-west1-a"
   # Default value
 }
+
+variable "name" {
+  description = "Unique name which all of the resources will have prefixed"
+  type        = string
+  default     = "howells"
+}
