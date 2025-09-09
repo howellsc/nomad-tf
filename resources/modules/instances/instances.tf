@@ -18,25 +18,25 @@ resource "google_storage_bucket_object" "nomad_script" {
   source = "${path.module}/startup-scripts/nomad-dev.sh"
 }
 
-resource "google_project_iam_member" "vm_storage_access" {
+resource "google_project_iam_member" "vm_sa_storage" {
   project = var.project_id
   role    = "roles/storage.objectViewer"
   member  = "serviceAccount:${google_service_account.vm_sa.email}"
 }
 
-resource "google_project_iam_member" "vm_compute_access" {
+resource "google_project_iam_member" "vm_sa_compute" {
   project = var.project_id
   role    = "roles/compute.viewer"
   member  = "serviceAccount:${google_service_account.vm_sa.email}"
 }
 
-resource "google_project_iam_member" "vm_logging" {
+resource "google_project_iam_member" "vm_sa_logging" {
   project = var.project_id
   role    = "roles/logging.logWriter"
   member  = "serviceAccount:${google_service_account.vm_sa.email}"
 }
 
-resource "google_project_iam_member" "vm_monitoring" {
+resource "google_project_iam_member" "vm_sa_monitoring" {
   project = var.project_id
   role    = "roles/monitoring.metricWriter"
   member  = "serviceAccount:${google_service_account.vm_sa.email}"
