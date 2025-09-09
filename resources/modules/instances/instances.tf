@@ -60,7 +60,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
 
   service_account {
     email  = google_service_account.vm_sa.email
-    scopes = ["roles/compute.viewer"]
+    scopes = []
   }
 
   metadata = {
