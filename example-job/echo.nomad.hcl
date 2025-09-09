@@ -1,26 +1,42 @@
-job "echo-docker" {
+job "http-echo" {
   datacenters = ["dc1"]
-  type        = "system" # Run on all nodes
+  type        = "system" # runs on all nodes
 
-  group "echo-group" {
-    task "echo-task" {
+  group "http-echo-group" {
+    network {
+      port "http" {
+        static = 8080
+      }
+    }
+
+    task "http-echo-task" {
       driver = "docker"
 
       config {
-        image = "alpine:latest"
-        command = "echo"
-        args = ["Hello from Nomad Docker job!"]
+        image = "ealen/echo-server:latest"
+        ports = ["http"]
       }
 
       resources {
         cpu    = 100
-        memory = 64
+        memory = 128
+        network {
+          mbits = 10
+          port "http" {}
+        }
       }
 
-      # Optional: If you want to see output via nomad logs
       logs {
         max_files     = 1
-        max_file_size = 2
+        max_file_size = 5
+      }
+
+      # Optional: restart config
+      restart {
+        attempts = 3
+        interval = "5m"
+        delay    = "10s"
+        mode     = "delay"
       }
     }
   }
