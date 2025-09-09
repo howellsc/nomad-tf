@@ -1,19 +1,26 @@
-job "echo" {
+job "echo-docker" {
   datacenters = ["dc1"]
-  type        = "system" # <== This runs the job on ALL clients
+  type        = "system" # Run on all nodes
 
-  group "echo" {
-    task "server" {
-      driver = "raw_exec" # or "exec" if not using raw_exec
+  group "echo-group" {
+    task "echo-task" {
+      driver = "docker"
 
       config {
-        command = "/bin/echo"
-        args    = ["Hello from Nomad system job!"]
+        image = "alpine:latest"
+        command = "echo"
+        args = ["Hello from Nomad Docker job!"]
       }
 
       resources {
         cpu    = 100
         memory = 64
+      }
+
+      # Optional: If you want to see output via nomad logs
+      logs {
+        max_files     = 1
+        max_file_size = 2
       }
     }
   }
