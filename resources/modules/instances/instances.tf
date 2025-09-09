@@ -30,6 +30,19 @@ resource "google_project_iam_member" "vm_compute_access" {
   member  = "serviceAccount:${google_service_account.vm_sa.email}"
 }
 
+resource "google_project_iam_member" "vm_logging" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.vm_sa.email}"
+}
+
+resource "google_project_iam_member" "vm_monitoring" {
+  project = var.project_id
+  role    = "roles/monitoring.metricWriter"
+  member  = "serviceAccount:${google_service_account.vm_sa.email}"
+}
+
+
 resource "google_compute_instance_template" "gce_nomad_template" {
 
   disk {
@@ -59,8 +72,10 @@ resource "google_compute_instance_template" "gce_nomad_template" {
   tags = ["allow-tcp-22-ingress", "allow-http-80-443-egress", "nomad"]
 
   service_account {
-    email  = google_service_account.vm_sa.email
-    scopes = []
+    email = google_service_account.vm_sa.email
+    scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
   }
 
   metadata = {
@@ -72,19 +87,6 @@ resource "google_compute_instance_template" "gce_nomad_template" {
     provisioning_model = "STANDARD"
     preemptible        = false
   }
-
-  # service_account {
-  #   email = "92595832024-compute@developer.gserviceaccount.com"
-  #   scopes = [
-  #     "https://www.googleapis.com/auth/devstorage.read_only",
-  #     "https://www.googleapis.com/auth/logging.write",
-  #     "https://www.googleapis.com/auth/monitoring.write",
-  #     "https://www.googleapis.com/auth/service.management.readonly",
-  #     "https://www.googleapis.com/auth/servicecontrol",
-  #     "https://www.googleapis.com/auth/trace.append",
-  #     "https://www.googleapis.com/auth/cloud-platform"
-  #   ]
-  # }
 }
 
 resource "google_compute_region_instance_group_manager" "gce_nomad_mig" {
