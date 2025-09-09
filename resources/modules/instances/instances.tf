@@ -55,7 +55,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
 
   region = var.region
 
-  machine_type = "e2-micro"
+  machine_type = "e2-medium"
   name         = "${var.name}-dev-micro-nomad"
 
   network_interface {
