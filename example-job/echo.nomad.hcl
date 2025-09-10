@@ -1,42 +1,24 @@
-job "http-echo" {
+job "docs" {
   datacenters = ["dc1"]
-  type        = "system" # runs on all nodes
 
-  group "http-echo-group" {
+  group "example" {
     network {
       port "http" {
-        static = 8080
+        static = "5678"
       }
     }
-
-    task "http-echo-task" {
+    task "server" {
       driver = "docker"
 
       config {
-        image = "ealen/echo-server:latest"
+        image = "hashicorp/http-echo"
         ports = ["http"]
-      }
-
-      resources {
-        cpu    = 100
-        memory = 128
-        network {
-          mbits = 10
-          port "http" {}
-        }
-      }
-
-      logs {
-        max_files     = 1
-        max_file_size = 5
-      }
-
-      # Optional: restart config
-      restart {
-        attempts = 3
-        interval = "5m"
-        delay    = "10s"
-        mode     = "delay"
+        args = [
+          "-listen",
+          ":5678",
+          "-text",
+          "hello world",
+        ]
       }
     }
   }
