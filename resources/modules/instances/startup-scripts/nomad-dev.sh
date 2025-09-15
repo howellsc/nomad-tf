@@ -5,7 +5,7 @@ set -euxo pipefail
 apt-get update && apt-get install -y unzip curl docker.io
 
 # Install Nomad
-NOMAD_VERSION="1.10.2"
+NOMAD_VERSION="1.10.5"
 curl -sLo nomad.zip https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
 unzip nomad.zip
 mv nomad /usr/local/bin/
