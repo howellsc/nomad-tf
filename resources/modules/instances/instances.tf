@@ -132,7 +132,7 @@ resource "google_compute_region_backend_service" "gce_nomad_backend_service" {
 
   port_name = "http" # Refer to the named port in the MIG (usually "http" or "https")
 
-  depends_on = [google_compute_region_instance_group_manager.gce_nomad_mig]
+  depends_on = [google_compute_region_instance_group_manager.gce_nomad_mig, google_compute_region_health_check.nomad_tcp]
 }
 
 resource "google_os_config_patch_deployment" "patch" {
