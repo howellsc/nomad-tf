@@ -15,13 +15,13 @@ resource "google_storage_bucket" "startup_scripts" {
 data "template_file" "nomad_startup_script" {
   template = file("${path.module}/startup-scripts/nomad-dev.sh.tmpl")
   vars = {
-    name = "name"
+    name = var.name
   }
 }
 
 resource "google_storage_bucket_object" "nomad_script" {
-  name   = "nomad-dev.sh"
-  bucket = google_storage_bucket.startup_scripts.name
+  name    = "nomad-dev.sh"
+  bucket  = google_storage_bucket.startup_scripts.name
   content = data.template_file.nomad_startup_script.rendered
 }
 
