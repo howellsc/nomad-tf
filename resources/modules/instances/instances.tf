@@ -73,7 +73,12 @@ resource "google_compute_instance_template" "gce_nomad_template" {
     "purpose"      = "container-orchestration"
   }
 
-  tags = ["allow-tcp-22-ingress", "allow-http-80-443-egress", "nomad", "iap-protected-vm"]
+  tags = [
+    "${var.name}-allow-tcp-22-ingress",
+    "${var.name}-allow-http-80-443-egress",
+    "${var.name}-nomad",
+    "${var.name}-iap-protected-vm"
+  ]
 
   service_account {
     email = google_service_account.vm_sa.email

@@ -16,7 +16,7 @@ resource "google_compute_firewall" "http" {
     google_compute_subnetwork.subnet_us-west2.ip_cidr_range
   ]
   target_tags = [
-    "allow-http-80-443-ingress"
+    "${var.name}-allow-http-80-443-ingress"
   ]
   source_tags = []
 
@@ -41,7 +41,7 @@ resource "google_compute_firewall" "ssh" {
     google_compute_subnetwork.subnet_us-west2.ip_cidr_range
   ]
   target_tags = [
-    "allow-tcp-22-ingress"
+    "${var.name}-allow-tcp-22-ingress"
   ]
   source_tags = []
 
@@ -59,7 +59,7 @@ resource "google_compute_firewall" "allow_nomad_ui" {
     ports    = ["4646"]
   }
 
-  target_tags = ["nomad"]
+  target_tags = ["${var.name}-nomad"]
   source_ranges = [google_compute_subnetwork.subnet_us-west2.ip_cidr_range
   ]
   direction = "INGRESS"
@@ -86,7 +86,7 @@ resource "google_compute_firewall" "allow_nomad_cluster" {
   source_ranges = [
     google_compute_subnetwork.subnet_us-west2.ip_cidr_range
   ]
-  target_tags = ["nomad"]
+  target_tags = ["${var.name}-nomad"]
 
   lifecycle {
     replace_triggered_by = [google_compute_network.vpc]
@@ -109,7 +109,7 @@ resource "google_compute_firewall" "egress" {
   destination_ranges = [
     google_compute_subnetwork.subnet_us-west2.ip_cidr_range
   ]
-  target_tags = ["allow-http-80-443-egress"]
+  target_tags = ["${var.name}-allow-http-80-443-egress"]
   source_tags = []
 
   lifecycle {
@@ -132,7 +132,7 @@ resource "google_compute_firewall" "allow_iap" {
   source_ranges = [
     "35.235.240.0/20"
   ]
-  target_tags = ["iap-protected-vm"]
+  target_tags = ["${var.name}-iap-protected-vm"]
   source_tags = []
 
   lifecycle {
