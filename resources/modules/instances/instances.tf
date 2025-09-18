@@ -22,7 +22,7 @@ data "template_file" "nomad_startup_script" {
 resource "google_storage_bucket_object" "nomad_script" {
   name   = "nomad-dev.sh"
   bucket = google_storage_bucket.startup_scripts.name
-  source = data.template_file.nomad_startup_script.rendered
+  content = data.template_file.nomad_startup_script.rendered
 }
 
 resource "google_project_iam_member" "vm_sa_storage" {
