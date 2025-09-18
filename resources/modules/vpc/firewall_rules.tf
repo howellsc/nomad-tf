@@ -128,7 +128,7 @@ resource "google_compute_firewall" "allow_iap" {
   direction = "INGRESS"
   name      = "${var.name}-network-iap-ingress"
   network   = google_compute_network.vpc.id
-  priority  = 1001
+  priority  = 999
   source_ranges = [
     "35.235.240.0/20"
   ]
