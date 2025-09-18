@@ -12,10 +12,17 @@ resource "google_storage_bucket" "startup_scripts" {
   uniform_bucket_level_access = true
 }
 
+data "template_file" "nomad_startup_script" {
+  template = file("${path.module}/startup-scripts/nomad-dev.sh.tmpl")
+  vars = {
+    name = "name"
+  }
+}
+
 resource "google_storage_bucket_object" "nomad_script" {
   name   = "nomad-dev.sh"
   bucket = google_storage_bucket.startup_scripts.name
-  source = "${path.module}/startup-scripts/nomad-dev.sh"
+  source = data.template_file.nomad_startup_script.rendered
 }
 
 resource "google_project_iam_member" "vm_sa_storage" {
