@@ -1,6 +1,8 @@
 job "docs" {
   datacenters = ["dc1"]
 
+  type = "system"
+
   group "example" {
     network {
       port "http" {

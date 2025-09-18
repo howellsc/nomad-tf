@@ -63,6 +63,10 @@ resource "google_compute_instance_template" "gce_nomad_template" {
     subnetwork = var.vpc_subnet_name
   }
 
+  shielded_instance_config {
+    enable_secure_boot = true
+  }
+
   labels = {
     "organisation" = var.name
     "type"         = "nomad"
