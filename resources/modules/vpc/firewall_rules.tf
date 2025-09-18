@@ -116,3 +116,26 @@ resource "google_compute_firewall" "egress" {
     replace_triggered_by = [google_compute_network.vpc]
   }
 }
+
+resource "google_compute_firewall" "allow_iap" {
+  allow {
+    ports = [
+      "4646",
+    ]
+    protocol = "tcp"
+  }
+
+  direction = "INGRESS"
+  name      = "${var.name}-network-iap-ingress"
+  network   = google_compute_network.vpc.id
+  priority  = 1000
+  source_ranges = [
+    "35.235.240.0/20"
+  ]
+  target_tags = ["iap-protected-vm"]
+  source_tags = []
+
+  lifecycle {
+    replace_triggered_by = [google_compute_network.vpc]
+  }
+}
