@@ -124,8 +124,9 @@ resource "google_compute_firewall" "allow_iap" {
   allow {
     ports = [
       "4646",
+      "22"
     ]
-    protocol = ["tcp","ssh"]
+    protocol = ["tcp"]
   }
 
   direction = "INGRESS"
