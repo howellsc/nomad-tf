@@ -3,5 +3,5 @@ output "vpc_name" {
 }
 
 output "vpc_subnet_us1_name" {
-  value = google_compute_subnetwork.subnet_us-west2.id
+  value = google_compute_subnetwork.subnet.id
 }

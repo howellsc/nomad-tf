@@ -3,8 +3,8 @@ resource "google_compute_network" "vpc" {
   auto_create_subnetworks = false
 }
 
-resource "google_compute_subnetwork" "subnet_us-west2" {
-  name          = "subnet-us-west2"
+resource "google_compute_subnetwork" "subnet" {
+  name          = "subnet-europe-north2"
   region        = var.region
   ip_cidr_range = "10.132.0.0/20"
 

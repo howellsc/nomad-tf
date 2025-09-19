@@ -13,7 +13,7 @@ resource "google_compute_firewall" "http" {
   network   = google_compute_network.vpc.id
   priority  = 1000
   source_ranges = [
-    google_compute_subnetwork.subnet_us-west2.ip_cidr_range
+    google_compute_subnetwork.subnet.ip_cidr_range
   ]
   target_tags = [
     "${var.name}-allow-http-80-443-ingress"
@@ -38,7 +38,7 @@ resource "google_compute_firewall" "ssh" {
   network   = google_compute_network.vpc.id
   priority  = 1000
   source_ranges = [
-    google_compute_subnetwork.subnet_us-west2.ip_cidr_range
+    google_compute_subnetwork.subnet.ip_cidr_range
   ]
   target_tags = [
     "${var.name}-allow-tcp-22-ingress"
@@ -61,7 +61,7 @@ resource "google_compute_firewall" "allow_nomad_ui" {
 
   target_tags = ["${var.name}-nomad"]
   source_ranges = [
-    google_compute_subnetwork.subnet_us-west2.ip_cidr_range,
+    google_compute_subnetwork.subnet.ip_cidr_range,
     "35.191.0.0/16",
     "130.211.0.0/22"
   ]
@@ -87,7 +87,7 @@ resource "google_compute_firewall" "allow_nomad_cluster" {
   }
 
   source_ranges = [
-    google_compute_subnetwork.subnet_us-west2.ip_cidr_range
+    google_compute_subnetwork.subnet.ip_cidr_range
   ]
   target_tags = ["${var.name}-nomad"]
 
@@ -110,7 +110,7 @@ resource "google_compute_firewall" "egress" {
   network   = google_compute_network.vpc.id
   priority  = 1000
   destination_ranges = [
-    google_compute_subnetwork.subnet_us-west2.ip_cidr_range
+    google_compute_subnetwork.subnet.ip_cidr_range
   ]
   target_tags = ["${var.name}-allow-http-80-443-egress"]
   source_tags = []
