@@ -60,7 +60,10 @@ resource "google_compute_firewall" "allow_nomad_ui" {
   }
 
   target_tags = ["${var.name}-nomad"]
-  source_ranges = [google_compute_subnetwork.subnet_us-west2.ip_cidr_range
+  source_ranges = [
+    google_compute_subnetwork.subnet_us-west2.ip_cidr_range,
+    "35.191.0.0/16",
+    "130.211.0.0/22"
   ]
   direction = "INGRESS"
 
