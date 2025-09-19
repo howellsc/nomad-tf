@@ -126,7 +126,7 @@ resource "google_compute_firewall" "allow_iap" {
       "4646",
       "22"
     ]
-    protocol = ["tcp"]
+    protocol = "tcp"
   }
 
   direction = "INGRESS"
