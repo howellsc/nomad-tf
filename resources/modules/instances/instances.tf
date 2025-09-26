@@ -160,6 +160,7 @@ resource "google_os_config_patch_deployment" "patch" {
 
   patch_config {
     mig_instances_allowed = true
+    reboot_config = "DEFAULT"
   }
 
   recurring_schedule {
