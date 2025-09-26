@@ -77,7 +77,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
     auto_delete  = true
     boot         = true
     type         = "PERSISTENT"
-    disk_size_gb = 10
+    disk_size_gb = 20
   }
 
   region = var.region
