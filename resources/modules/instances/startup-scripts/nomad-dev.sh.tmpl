@@ -1,10 +1,13 @@
 #!/bin/bash
 set -euxo pipefail
 
-apt-get install google-osconfig-agent
-
 # Install dependencies
 apt-get update && apt-get install -y unzip curl docker.io
+
+apt-get install google-osconfig-agent
+
+curl -sSO https://dl.google.com/cloudagents/add-google-ops-agent-repo.sh
+add-google-ops-agent-repo.sh --also-install
 
 # Install Nomad
 NOMAD_VERSION="1.10.5"
