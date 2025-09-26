@@ -12,17 +12,30 @@ resource "google_storage_bucket" "startup_scripts" {
   uniform_bucket_level_access = true
 }
 
-data "template_file" "nomad_startup_script" {
-  template = file("${path.module}/startup-scripts/nomad-dev.sh.tmpl")
+data "template_file" "nomad_ubuntu_startup_script" {
+  template = file("${path.module}/startup-scripts/nomad-ubuntu.sh.tmpl")
   vars = {
     name = var.name
   }
 }
 
-resource "google_storage_bucket_object" "nomad_script" {
-  name    = "nomad-dev.sh"
+data "template_file" "nomad_rocky_startup_script" {
+  template = file("${path.module}/startup-scripts/nomad-rocky.sh.tmpl")
+  vars = {
+    name = var.name
+  }
+}
+
+resource "google_storage_bucket_object" "nomad_ubuntu_script" {
+  name    = "nomad-ubuntu-dev.sh"
   bucket  = google_storage_bucket.startup_scripts.name
-  content = data.template_file.nomad_startup_script.rendered
+  content = data.template_file.nomad_ubuntu_startup_script.rendered
+}
+
+resource "google_storage_bucket_object" "nomad_rocky_script" {
+  name    = "nomad-rocky-dev.sh"
+  bucket  = google_storage_bucket.startup_scripts.name
+  content = data.template_file.nomad_rocky_startup_script.rendered
 }
 
 resource "google_project_iam_member" "vm_sa_storage" {
@@ -59,7 +72,8 @@ resource "google_project_iam_member" "vm_sa_monitoring" {
 resource "google_compute_instance_template" "gce_nomad_template" {
 
   disk {
-    source_image = "ubuntu-os-cloud/ubuntu-2204-lts"
+    //source_image = "ubuntu-os-cloud/ubuntu-2204-lts"
+    source_image = "rocky-linux-cloud/rocky-linux-9"
     auto_delete  = true
     boot         = true
     type         = "PERSISTENT"
@@ -103,7 +117,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
   metadata = {
     enable-osconfig         = true
     enable-guest-attributes = true
-    startup-script-url      = "gs://${google_storage_bucket.startup_scripts.name}/nomad-dev.sh"
+    startup-script-url      = "gs://${google_storage_bucket.startup_scripts.name}/nomad-rocky.sh"
   }
 
   scheduling {

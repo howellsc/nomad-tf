@@ -1,0 +1,128 @@
+#!/bin/bash
+set -euxo pipefail
+
+# --------------------------
+# Install dependencies
+# --------------------------
+
+# Update packages and install base dependencies
+dnf update -y
+dnf install -y unzip curl yum-utils shadow-utils
+
+# --------------------------
+# Install Docker CE
+# --------------------------
+
+# Remove any old Docker versions
+dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine || true
+
+# Add Docker repo and install Docker CE
+dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+systemctl enable --now docker
+
+# --------------------------
+# Install Google OS Config Agent
+# --------------------------
+
+dnf install -y https://packages.cloud.google.com/yum/repos/google-cloud-osconfig-el8-x86_64/latest/google-osconfig-agent.rpm
+
+systemctl enable --now google-osconfig-agent
+
+# --------------------------
+# Install Google Cloud Ops Agent
+# --------------------------
+
+curl -sSO https://dl.google.com/cloudagents/add-google-ops-agent-repo.sh
+bash add-google-ops-agent-repo.sh --also-install
+
+# --------------------------
+# Install Nomad
+# --------------------------
+
+NOMAD_VERSION="1.10.5"
+curl -sLo nomad.zip https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
+unzip nomad.zip
+mv nomad /usr/local/bin/
+rm nomad.zip
+
+# --------------------------
+# Create Nomad user
+# --------------------------
+
+useradd --system --home /etc/nomad.d --shell /bin/false nomad || true
+
+# Add nomad user to docker group
+usermod -aG docker nomad
+sudo -u nomad docker ps || true  # This will likely show permission denied until reboot or re-login
+
+# --------------------------
+# Get local IP
+# --------------------------
+
+LOCAL_IP=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip)
+export NOMAD_IP=$LOCAL_IP
+
+mkdir -p /opt/nomad/
+chown -R nomad:nomad /opt/nomad/
+
+# --------------------------
+# Write Nomad config
+# --------------------------
+
+cat > /etc/nomad.hcl <<EOF
+datacenter = "dc1"
+data_dir = "/opt/nomad/data"
+bind_addr = "0.0.0.0"
+
+advertise {
+  http = "$LOCAL_IP"
+  rpc  = "$LOCAL_IP"
+  serf = "$LOCAL_IP"
+}
+
+server {
+  enabled          = true
+  bootstrap_expect = 3
+  server_join {
+    retry_join = ["provider=gce tag_value=\${name}-nomad"]
+  }
+}
+
+client {
+  enabled = true
+  server_join {
+    retry_join = ["provider=gce tag_value=\${name}-nomad"]
+  }
+}
+EOF
+
+# --------------------------
+# Create systemd service
+# --------------------------
+
+cat > /etc/systemd/system/nomad.service <<EOF
+[Unit]
+Description=Nomad Dev Agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=nomad
+Group=nomad
+ExecStart=/usr/local/bin/nomad agent -config=/etc/nomad.hcl
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# --------------------------
+# Start the Nomad service
+# --------------------------
+
+systemctl daemon-reexec
+systemctl enable nomad
+systemctl start nomad
