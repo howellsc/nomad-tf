@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euxo pipefail
 
+apt-get install google-osconfig-agent
+
 # Install dependencies
 apt-get update && apt-get install -y unzip curl docker.io
 
