@@ -22,20 +22,20 @@ dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker
 
 systemctl enable --now docker
 
-# --------------------------
-# Install Google OS Config Agent
-# --------------------------
-
-dnf install -y https://packages.cloud.google.com/yum/repos/google-cloud-osconfig-el8-x86_64/latest/google-osconfig-agent.rpm
-
-systemctl enable --now google-osconfig-agent
-
-# --------------------------
-# Install Google Cloud Ops Agent
-# --------------------------
-
-curl -sSO https://dl.google.com/cloudagents/add-google-ops-agent-repo.sh
-bash add-google-ops-agent-repo.sh --also-install
+## --------------------------
+## Install Google OS Config Agent
+## --------------------------
+#
+#dnf install -y https://packages.cloud.google.com/yum/repos/google-cloud-osconfig-el8-x86_64/latest/google-osconfig-agent.rpm
+#
+#systemctl enable --now google-osconfig-agent
+#
+## --------------------------
+## Install Google Cloud Ops Agent
+## --------------------------
+#
+#curl -sSO https://dl.google.com/cloudagents/add-google-ops-agent-repo.sh
+#bash add-google-ops-agent-repo.sh --also-install
 
 # --------------------------
 # Install Nomad
