@@ -31,6 +31,12 @@ resource "google_project_iam_member" "vm_sa_storage" {
   member  = "serviceAccount:${google_service_account.vm_sa.email}"
 }
 
+resource "google_project_iam_member" "vm_sa_guest_policy_admin" {
+  project = var.project_id
+  role    = "roles/osconfig.guestPolicyAdmin"
+  member  = "serviceAccount:${google_service_account.vm_sa.email}"
+}
+
 resource "google_project_iam_member" "vm_sa_compute" {
   project = var.project_id
   role    = "roles/compute.viewer"
