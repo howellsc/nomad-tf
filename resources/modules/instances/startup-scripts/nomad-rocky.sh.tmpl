@@ -42,7 +42,7 @@ bash add-google-ops-agent-repo.sh --also-install
 # --------------------------
 
 NOMAD_VERSION="1.10.5"
-curl -sLo nomad.zip https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
+curl -sLo nomad.zip https://releases.hashicorp.com/nomad/$${NOMAD_VERSION}/nomad_$${NOMAD_VERSION}_linux_amd64.zip
 unzip nomad.zip
 mv nomad /usr/local/bin/
 rm nomad.zip
