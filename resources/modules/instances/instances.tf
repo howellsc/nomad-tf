@@ -158,6 +158,10 @@ resource "google_os_config_patch_deployment" "patch" {
     all = true
   }
 
+  patch_config {
+    mig_instances_allowed = true
+  }
+
   recurring_schedule {
     time_zone {
       id = "Europe/London"
