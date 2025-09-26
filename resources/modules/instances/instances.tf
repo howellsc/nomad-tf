@@ -73,7 +73,7 @@ resource "google_compute_instance_template" "gce_nomad_template" {
 
   disk {
     //source_image = "ubuntu-os-cloud/ubuntu-2204-lts"
-    source_image = "rocky-linux-cloud/rocky-linux-9"
+    source_image = "rocky-linux-cloud/rocky-linux-9-optimized-gcp"
     auto_delete  = true
     boot         = true
     type         = "PERSISTENT"
