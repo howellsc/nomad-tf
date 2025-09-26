@@ -27,13 +27,13 @@ data "template_file" "nomad_rocky_startup_script" {
 }
 
 resource "google_storage_bucket_object" "nomad_ubuntu_script" {
-  name    = "nomad-ubuntu-dev.sh"
+  name    = "nomad-ubuntu.sh"
   bucket  = google_storage_bucket.startup_scripts.name
   content = data.template_file.nomad_ubuntu_startup_script.rendered
 }
 
 resource "google_storage_bucket_object" "nomad_rocky_script" {
-  name    = "nomad-rocky-dev.sh"
+  name    = "nomad-rocky.sh"
   bucket  = google_storage_bucket.startup_scripts.name
   content = data.template_file.nomad_rocky_startup_script.rendered
 }
