@@ -101,8 +101,9 @@ resource "google_compute_instance_template" "gce_nomad_template" {
   }
 
   metadata = {
-    "enable-osconfig"  = "TRUE"
-    startup-script-url = "gs://${google_storage_bucket.startup_scripts.name}/nomad-dev.sh"
+    enable-osconfig         = true
+    enable-guest-attributes = true
+    startup-script-url      = "gs://${google_storage_bucket.startup_scripts.name}/nomad-dev.sh"
   }
 
   scheduling {
@@ -166,7 +167,7 @@ resource "google_os_config_patch_deployment" "patch" {
 
   patch_config {
     mig_instances_allowed = true
-    reboot_config = "DEFAULT"
+    reboot_config         = "DEFAULT"
   }
 
   recurring_schedule {
